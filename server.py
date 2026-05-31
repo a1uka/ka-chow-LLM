@@ -1,5 +1,6 @@
 import os
 import time
+from model_prompt import SYSTEM_PROMPT
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
@@ -16,13 +17,6 @@ LLM_BASE_URL = "http://localhost:1234/v1"   # llm loc
 LLM_MODEL = "local-model"
 LLM_API_KEY = "not-needed"
 # prompt
-SYSTEM_PROMPT = """Ты — ИИ-ассистент для врачей акушеров-гинекологов, работающий строго на основе клинических рекомендаций РОАГ.
-- Отвечай только на основании предоставленных фрагментов (контекста).
-- Если в контексте нет ответа, честно скажи: "В предоставленных клинических рекомендациях ответ не найден".
-- Не добавляй информацию из своих общих знаний.
-- Отвечай на русском языке, максимально точно и структурированно.
-- Указывай источники (названия файлов), которые упоминаются в метаданных.
-"""
 
 EMERGENCY_TRIGGERS = [
     "сильное кровотечение", "кровь идёт", "судороги", "потеря сознания",
@@ -33,7 +27,7 @@ EMERGENCY_TRIGGERS = [
 ]
 
 EMERGENCY_RESPONSE = (
-    "❗ Описанные вами симптомы могут указывать на неотложное состояние. "
+    "! Описанные вами симптомы могут указывать на неотложное состояние. "
     "Пожалуйста, немедленно обратитесь в скорую помощь (тел. 112 или 103) "
     "или к вашему лечащему врачу. "
     "Данный ассистент не предназначен для диагностики и консультаций в экстренных ситуациях."
@@ -102,7 +96,7 @@ def call_llm(messages, max_retries=2, timeout=15):
 
         if attempt < max_retries:
             time.sleep(1)
-    return f"❌ {last_exception}. Пожалуйста, попробуйте позже."
+    return f"X {last_exception}. Пожалуйста, попробуйте позже."
 
 # rag query
 def ask_assistant(user_query: str, vectorstore) -> str:
@@ -148,7 +142,7 @@ async def ask_endpoint(req: QueryRequest):
         return {"answer": EMERGENCY_RESPONSE, "status": "emergency", "emergency": True}
 
     answer = ask_assistant(query, vectorstore)
-    if answer.startswith("❌"):
+    if answer.startswith("X"):
         return {"answer": answer, "status": "error", "emergency": False}
     return {"answer": answer, "status": "ok", "emergency": False}
 
