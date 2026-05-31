@@ -1,6 +1,6 @@
 import os
 import time
-from model_prompt import SYSTEM_PROMPT
+from model_prompt import SYSTEM_PROMPT, EMERGENCY_RESPONSE, EMERGENCY_TRIGGERS
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
@@ -16,22 +16,6 @@ EMBEDDING_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-mpnet-base
 LLM_BASE_URL = "http://localhost:1234/v1"   # llm loc
 LLM_MODEL = "local-model"
 LLM_API_KEY = "not-needed"
-# prompt
-
-EMERGENCY_TRIGGERS = [
-    "сильное кровотечение", "кровь идёт", "судороги", "потеря сознания",
-    "резкая слабость", "острая боль в животе", "давление 160",
-    "не чувствую ребёнка", "не шевелится", "отслойка плаценты",
-    "преэклампсия", "эклампсия", "внезапная одышка",
-    "кровь из влагалища", "слишком сильная боль", "высокая температура 40"
-]
-
-EMERGENCY_RESPONSE = (
-    "! Описанные вами симптомы могут указывать на неотложное состояние. "
-    "Пожалуйста, немедленно обратитесь в скорую помощь (тел. 112 или 103) "
-    "или к вашему лечащему врачу. "
-    "Данный ассистент не предназначен для диагностики и консультаций в экстренных ситуациях."
-)
 
 # global objects
 vectorstore = None
