@@ -114,7 +114,7 @@ def ask_assistant(user_query: str, vectorstore) -> str:
 @app.get("/")
 async def root():
     return {"status": "ok", "message": "Ассистент работает"}
-
+# health status
 @app.get("/health/llm")
 async def health_llm():
     try:
